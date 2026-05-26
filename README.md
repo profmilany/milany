@@ -1,6 +1,6 @@
 # Vibe Coding e Inteligência Artificial na Criação de Jogos Didáticos para o Ensino de Matemática no Ensino Médio
 
-Plataforma educacional estática criada para o repositório **profmilany**, voltada ao Ensino Médio brasileiro. O projeto apresenta jogos didáticos, sequências didáticas, explicações teóricas, gamificação, ranking local e organização pedagógica alinhada à BNCC.
+Plataforma educacional estática criada para o repositório **mathvibe**, voltada ao Ensino Médio brasileiro. O projeto apresenta jogos didáticos, sequências didáticas, explicações teóricas, gamificação, ranking local e organização pedagógica alinhada à BNCC.
 
 ## Objetivo
 
@@ -88,7 +88,7 @@ Abra o arquivo `index.html` no navegador ou use uma extensão de servidor local,
 
 ## Como publicar no GitHub Pages
 
-1. Envie todos os arquivos para o repositório `profmilany`.
+1. Envie todos os arquivos para o repositório `mathvibe`.
 2. Acesse as configurações do repositório no GitHub.
 3. Entre em **Pages**.
 4. Em **Build and deployment**, selecione **Deploy from a branch**.
