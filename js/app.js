@@ -1,4 +1,4 @@
-// Controla navegação, tema, cards de conteúdo, progresso e ranking local.
+// Controla navegação, tema, cards pedagógicos, progresso, XP e ranking local.
 (function () {
   const data = window.PROFMILANY_DATA;
 
@@ -50,16 +50,26 @@
     items.forEach((item) => observer.observe(item));
   }
 
+  function getGame(progress, topicId) {
+    return progress.games?.[topicId] || { unlockedLevel: 1, xp: 0, bestScore: 0, completed: false, stars: {} };
+  }
+
+  function totalStars(game) {
+    return Object.values(game.stars || {}).reduce((sum, value) => sum + value, 0);
+  }
+
   function updateProgressUI() {
     const progress = window.ProfMilanyGame.getProgress();
-    const total = Object.values(data.years).flat().length;
-    const completed = Object.keys(progress.completed).length;
-    const percent = Math.round((completed / total) * 100);
+    const totalLevels = Object.values(data.years).flat().length * 5;
+    const completedLevels = Object.values(progress.games || {}).reduce((sum, game) => sum + Object.keys(game.stars || {}).length, 0);
+    const percent = Math.round((completedLevels / totalLevels) * 100);
     document.querySelectorAll("[data-progress-label]").forEach((item) => item.textContent = `${percent}%`);
     document.querySelectorAll("[data-progress-bar]").forEach((item) => item.style.width = `${percent}%`);
     document.querySelectorAll("[data-achievement]").forEach((item) => {
       item.classList.toggle("unlocked", Boolean(progress.achievements[item.dataset.achievement]));
     });
+    document.querySelectorAll("[data-total-xp-page]").forEach((item) => item.textContent = progress.totalXp || 0);
+    document.querySelectorAll("[data-player-level-page]").forEach((item) => item.textContent = window.ProfMilanyGame.playerLevel(progress.totalXp || 0));
   }
 
   function renderTopics() {
@@ -69,33 +79,52 @@
     const topics = data.years[year] || [];
     const progress = window.ProfMilanyGame.getProgress();
 
-    container.innerHTML = topics.map((topic) => `
-      <article class="topic-card reveal">
-        <div class="topic-topline">
-          <span class="badge">${topic.badge}</span>
-          <span class="achievement-pill ${progress.completed[topic.id] ? "unlocked" : ""}">${progress.completed[topic.id] ? "Concluído" : "Novo"}</span>
-        </div>
-        <h3>${topic.title}</h3>
-        <p>${topic.explanation}</p>
-        <strong>Sequência didática</strong>
-        <ul class="sequence-list">
-          <li><strong>Objetivo:</strong> ${topic.sequence.objetivo}</li>
-          <li><strong>BNCC:</strong> ${topic.sequence.bncc}</li>
-          <li><strong>Metodologia:</strong> ${topic.sequence.metodologia}</li>
-          <li><strong>Recursos:</strong> ${topic.sequence.recursos}</li>
-          <li><strong>Etapas:</strong> ${topic.sequence.etapas.slice(0, 3).join(" ")}</li>
-          <li><strong>Avaliação:</strong> ${topic.sequence.avaliacao}</li>
-          <li><strong>Atividade complementar:</strong> ${topic.sequence.complementares}</li>
-        </ul>
-        <div class="achievement-list">
-          ${data.achievements.map((achievement) => `<span class="achievement-pill" data-achievement="${achievement.id}">${achievement.label}</span>`).join("")}
-        </div>
-        <div class="topic-actions">
-          <button class="btn primary" type="button" data-play="${topic.id}">Jogar</button>
-          <button class="btn secondary" type="button" data-details="${topic.id}">Ver etapas</button>
-        </div>
-      </article>
-    `).join("");
+    container.innerHTML = topics.map((topic) => {
+      const game = getGame(progress, topic.id);
+      const mechanic = window.ProfMilanyGame.mechanics[topic.id] || { name: topic.badge, medal: "Medalha Matemática" };
+      const unlocked = game.unlockedLevel || 1;
+      const stars = totalStars(game);
+      return `
+        <article class="topic-card reveal">
+          <div class="topic-topline">
+            <span class="badge">${mechanic.name}</span>
+            <span class="achievement-pill ${game.completed ? "unlocked" : ""}">${game.completed ? "Concluído" : `Nível ${unlocked}/5`}</span>
+          </div>
+          <h3>${topic.title}</h3>
+          <p>${topic.explanation}</p>
+          <div class="game-summary">
+            <div><span>XP</span><strong>${game.xp || 0}</strong></div>
+            <div><span>Estrelas</span><strong>${stars}/15</strong></div>
+            <div><span>Melhor pontuação</span><strong>${game.bestScore || 0}</strong></div>
+          </div>
+          <div class="mini-level-path" aria-label="Progresso interno do jogo">
+            ${[1, 2, 3, 4, 5].map((level) => {
+              const levelStars = game.stars?.[level] || 0;
+              const state = levelStars ? "done" : level <= unlocked ? "open" : "locked";
+              return `<span class="${state}" title="Nível ${level}">${state === "locked" ? "🔒" : levelStars ? "★" : level}</span>`;
+            }).join("")}
+          </div>
+          <strong>Sequência didática</strong>
+          <ul class="sequence-list">
+            <li><strong>Objetivo:</strong> ${topic.sequence.objetivo}</li>
+            <li><strong>BNCC:</strong> ${topic.sequence.bncc}</li>
+            <li><strong>Metodologia:</strong> ${topic.sequence.metodologia}</li>
+            <li><strong>Recursos:</strong> ${topic.sequence.recursos}</li>
+            <li><strong>Etapas:</strong> ${topic.sequence.etapas.slice(0, 3).join(" ")}</li>
+            <li><strong>Avaliação:</strong> ${topic.sequence.avaliacao}</li>
+            <li><strong>Atividade complementar:</strong> ${topic.sequence.complementares}</li>
+          </ul>
+          <div class="achievement-list">
+            ${data.achievements.map((achievement) => `<span class="achievement-pill" data-achievement="${achievement.id}">${achievement.label}</span>`).join("")}
+            <span class="achievement-pill ${game.completed ? "unlocked" : ""}">${mechanic.medal}</span>
+          </div>
+          <div class="topic-actions">
+            <button class="btn primary" type="button" data-play="${topic.id}">${game.completed ? "Revisar jogo" : "Jogar"}</button>
+            <button class="btn secondary" type="button" data-details="${topic.id}">Ver etapas</button>
+          </div>
+        </article>
+      `;
+    }).join("");
 
     container.querySelectorAll("[data-play]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -120,7 +149,7 @@
     if (!list) return;
     const entries = window.ProfMilanyGame.getRanking();
     if (!entries.length) {
-      list.innerHTML = "<li>Nenhuma pontuação registrada ainda. Jogue um desafio do 3º Ano para começar.</li>";
+      list.innerHTML = "<li>Nenhuma pontuação registrada ainda. Conclua todos os níveis de um jogo do 3º Ano para começar.</li>";
       return;
     }
     list.innerHTML = entries.map((entry) => `<li><strong>${entry.score} pontos</strong> em ${entry.topic} <span>(${entry.date})</span></li>`).join("");

@@ -73,14 +73,27 @@ Servir como produto educacional de TCC, demonstrando como vibe coding e intelig�
 
 - Menu responsivo
 - Modo escuro
-- Jogos com pontuação, cronômetro e feedback
+- Jogos independentes por conteúdo, cada um com 5 níveis internos
+- Pontuação, cronômetro, feedback visual, XP e estrelas
 - Barra de progresso geral
-- Conquistas locais
+- Conquistas e medalhas locais
 - Ranking local para desafios do 3º Ano
 - Sons opcionais
 - Botão de voltar ao topo
 - Sequência didática em cada conteúdo
 - Layout responsivo para celular e desktop
+
+## Gamificação
+
+Cada conteúdo possui um jogo próprio e independente. Dentro de cada jogo, o estudante avança por cinco níveis de dificuldade:
+
+1. Muito fácil
+2. Fácil
+3. Médio
+4. Difícil
+5. Desafio final
+
+Ao concluir um nível, a plataforma mostra estrelas, XP conquistado, aproveitamento e libera o próximo nível do mesmo jogo. O progresso é salvo no navegador por `localStorage`.
 
 ## Como executar localmente
 
