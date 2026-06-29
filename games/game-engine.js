@@ -13,7 +13,7 @@
   ];
 
   const MECHANICS = {
-    "funcao-1-grau": { type: "investigation", name: "Missão investigativa", medal: "Mestre das Funções" },
+    "funcao-1-grau": { type: "capture-coins", name: "Missão das Retas", medal: "Mestre das Funções" },
     "funcao-2-grau": { type: "parabola", name: "Plano de parábolas", medal: "Arquiteto das Parábolas" },
     conjuntos: { type: "set-sort", name: "Laboratório de conjuntos", medal: "Guardião dos Conjuntos" },
     pa: { type: "sequence", name: "Sequência contra o tempo", medal: "Mestre das Sequências" },
@@ -34,6 +34,57 @@
     "funcoes-logaritmicas": { type: "decode", name: "Missões de decodificação", medal: "Decodificador Logarítmico" },
     polinomios: { type: "combat", name: "Combate polinomial", medal: "Campeão dos Polinômios" },
     "numeros-complexos": { type: "complex-plane", name: "Navegação complexa", medal: "Navegador Complexo" }
+  };
+
+  const CAPTURE_COINS_DATA = {
+    "funcao-1-grau": {
+      1: {
+        name: "Introdução",
+        description: "Use funções simples para capturar moedas",
+        coins: [
+          { id: 0, x: 2, y: 4, refA: 1, refB: 2, desc: "f(x) = x + 2" },
+          { id: 1, x: 3, y: 5, refA: 1, refB: 2, desc: "f(x) = x + 2" },
+          { id: 2, x: 1, y: 4, refA: 1, refB: 3, desc: "f(x) = x + 3" }
+        ]
+      },
+      2: {
+        name: "Coeficiente Angular",
+        description: "Ajuste a inclinação da reta",
+        coins: [
+          { id: 0, x: 2, y: 5, refA: 2, refB: 1, desc: "f(x) = 2x + 1" },
+          { id: 1, x: 3, y: 7, refA: 2, refB: 1, desc: "f(x) = 2x + 1" },
+          { id: 2, x: 4, y: 2, refA: 0.5, refB: 0, desc: "f(x) = x/2" }
+        ]
+      },
+      3: {
+        name: "Coeficiente Linear",
+        description: "Ajuste onde a reta corta o eixo Y",
+        coins: [
+          { id: 0, x: 2, y: 7, refA: 2, refB: 3, desc: "f(x) = 2x + 3" },
+          { id: 1, x: 3, y: 5, refA: 1, refB: 2, desc: "f(x) = x + 2" },
+          { id: 2, x: 1, y: -1, refA: 2, refB: -3, desc: "f(x) = 2x - 3" }
+        ]
+      },
+      4: {
+        name: "Desafios",
+        description: "Combine coeficientes para capturar moedas",
+        coins: [
+          { id: 0, x: 5, y: 10, refA: 1, refB: 5, desc: "f(x) = x + 5" },
+          { id: 1, x: 3, y: 0, refA: 1, refB: -3, desc: "f(x) = x - 3" },
+          { id: 2, x: -2, y: 4, refA: -2, refB: 0, desc: "f(x) = -2x" }
+        ]
+      },
+      5: {
+        name: "Desafio Final",
+        description: "Várias moedas! Capture todas com funções diferentes",
+        coins: [
+          { id: 0, x: 2, y: 8, refA: 3, refB: 2, desc: "f(x) = 3x + 2" },
+          { id: 1, x: 4, y: -1, refA: -1, refB: 3, desc: "f(x) = -x + 3" },
+          { id: 2, x: 1, y: 5, refA: 4, refB: 1, desc: "f(x) = 4x + 1" },
+          { id: 3, x: -3, y: 1, refA: 1, refB: 4, desc: "f(x) = x + 4" }
+        ]
+      }
+    }
   };
 
   function freshProgress() {
@@ -313,6 +364,11 @@
         stage.querySelector("[data-time]").textContent = `${minutes}:${rest}`;
       }, 1000);
 
+      if (mechanic.type === "capture-coins") {
+        startCaptureCoins(topic, activeLevel, mechanic, state, stage, finishLevel, feedback);
+        return;
+      }
+
       renderChallenge(topic, mechanic, state, stage.querySelector("[data-mechanic-stage]"), answerChallenge, finishLevel);
 
       function answerChallenge(ok, message) {
@@ -340,8 +396,9 @@
       if (state.finished) return;
       state.finished = true;
       clearInterval(timer);
-      const total = state.level.challenges.length;
-      const accuracy = Math.round((state.correct / total) * 100);
+      const missionsForLevel = CAPTURE_COINS_DATA[topic.id]?.[state.level.id];
+      const total = missionsForLevel ? missionsForLevel.coins.length : state.level.challenges.length;
+      const accuracy = missionsForLevel ? Math.round((state.correct / total) * 100) : Math.round((state.correct / total) * 100);
       const stars = accuracy >= 90 && state.wrong === 0 ? 3 : accuracy >= 65 ? 2 : 1;
       const bonus = state.wrong === 0 ? 30 : 0;
       const gainedXp = state.xp + 50 + bonus;
@@ -397,6 +454,274 @@
       root.querySelector("[data-player-xp-bar]").style.width = `${nextLevelPercent(progress.totalXp)}%`;
     }
 
+    function startCaptureCoins(topic, levelId, mechanic, state, stage, onFinish, feedback) {
+      const missions = CAPTURE_COINS_DATA[topic.id]?.[levelId];
+      if (!missions) { feedback("Missão não encontrada!", false); return; }
+
+      let currentCoinIndex = 0;
+      let attempts = 0;
+      let captured = [];
+      let lastLineFunc = null;
+      const mechanicStage = stage.querySelector("[data-mechanic-stage]");
+
+      function parseFunction(input) {
+        let s = input.replace(/\s/g, "").toLowerCase();
+        s = s.replace(/^f\(x\)=/, "");
+        s = s.replace(/\*x/g, "x");
+        if (!s) return null;
+        if (s === "x") return { a: 1, b: 0 };
+        if (s === "-x") return { a: -1, b: 0 };
+        const xIndex = s.indexOf("x");
+        if (xIndex >= 0) {
+          let aStr = s.slice(0, xIndex);
+          let rest = s.slice(xIndex + 1);
+          let a = 1;
+          if (aStr === "" || aStr === "+") a = 1;
+          else if (aStr === "-") a = -1;
+          else {
+            if (aStr.includes("/")) {
+              const parts = aStr.split("/");
+              a = parseFloat(parts[0]) / parseFloat(parts[1]);
+            } else a = parseFloat(aStr);
+          }
+          let b = 0;
+          if (rest) {
+            rest = rest.replace(/\+/g, " +").replace(/-/g, " -").trim();
+            const parts = rest.split(/\s+/).filter(Boolean);
+            for (const part of parts) {
+              const num = parseFloat(part);
+              if (!isNaN(num)) b += num;
+            }
+          }
+          return { a, b };
+        }
+        const justNum = parseFloat(s);
+        if (!isNaN(justNum)) return { a: 0, b: justNum };
+        return null;
+      }
+
+      function drawCanvas(coin, lineFunc) {
+        const canvas = mechanicStage.querySelector("#ccCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const W = canvas.width, H = canvas.height;
+        const pad = 40;
+        const gW = W - pad * 2, gH = H - pad * 2;
+        const xMin = -8, xMax = 8, yMin = -8, yMax = 8;
+        const xS = gW / (xMax - xMin), yS = gH / (yMax - yMin);
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--surface") || "#f8faff";
+        ctx.fillRect(0, 0, W, H);
+
+        const gridColor = getComputedStyle(document.documentElement).getPropertyValue("--border") || "#e0e8f0";
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue("--muted") || "#666";
+        ctx.strokeStyle = gridColor; ctx.lineWidth = 0.5;
+        for (let i = xMin; i <= xMax; i++) {
+          const x = pad + (i - xMin) * xS;
+          ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke();
+        }
+        for (let i = yMin; i <= yMax; i++) {
+          const y = H - pad - (i - yMin) * yS;
+          ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+        }
+        const y0 = H - pad - (0 - yMin) * yS, x0 = pad + (0 - xMin) * xS;
+        ctx.strokeStyle = textColor; ctx.lineWidth = 1.8;
+        ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(W - pad, y0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x0, pad); ctx.lineTo(x0, H - pad); ctx.stroke();
+        ctx.fillStyle = textColor; ctx.font = "11px sans-serif"; ctx.textAlign = "center";
+        for (let i = xMin; i <= xMax; i++) { if (i === 0) continue; ctx.fillText(i, pad + (i - xMin) * xS, y0 + 16); }
+        ctx.textAlign = "right";
+        for (let i = yMin; i <= yMax; i++) { if (i === 0) continue; ctx.fillText(i, x0 - 6, H - pad - (i - yMin) * yS + 4); }
+        ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.font = "bold 11px sans-serif";
+        ctx.fillText("x", W - pad + 12, y0 + 4);
+        ctx.fillText("y", x0 - 14, pad - 6);
+        ctx.fillText("0", x0 - 10, y0 + 16);
+
+        const func = lineFunc || lastLineFunc;
+        if (func) {
+          ctx.strokeStyle = "#0f9f8f"; ctx.lineWidth = 3;
+          ctx.beginPath(); let first = true;
+          for (let px = 0; px <= gW; px++) {
+            const xVal = xMin + (px / gW) * (xMax - xMin);
+            const yVal = func(xVal);
+            if (isFinite(yVal)) {
+              const cx = pad + px, cy = H - pad - (yVal - yMin) * yS;
+              if (first) { ctx.moveTo(cx, cy); first = false; } else ctx.lineTo(cx, cy);
+            }
+          }
+          ctx.stroke();
+        }
+
+        missions.coins.forEach((c) => {
+          const cp = captured.includes(c.id);
+          const cx = pad + (c.x - xMin) * xS, cy = H - pad - (c.y - yMin) * yS;
+          if (cp) {
+            ctx.fillStyle = "#4caf50"; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center";
+            ctx.fillText("✓", cx, cy + 4);
+          } else {
+            const grad = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 12);
+            grad.addColorStop(0, "#ffd700"); grad.addColorStop(0.6, "#ffa500"); grad.addColorStop(1, "#b8860b");
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = "#b8860b"; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = "#8B6914"; ctx.font = "bold 11px sans-serif"; ctx.textAlign = "center";
+            ctx.fillText("$", cx, cy + 4);
+          }
+        });
+
+        const cur = missions.coins[currentCoinIndex];
+        if (cur && !captured.includes(cur.id)) {
+          ctx.fillStyle = "#ef5b7d"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center";
+          const cx = pad + (cur.x - xMin) * xS, cy = H - pad - (cur.y - yMin) * yS;
+          ctx.fillText("◉", cx, cy - 18);
+        }
+      }
+
+      function renderCoinGrid() {
+        const grid = mechanicStage.querySelector(".cc-coin-grid");
+        if (!grid) return;
+        grid.innerHTML = missions.coins.map((c, i) => {
+          const cp = captured.includes(c.id);
+          return `<span class="cc-coin-dot ${cp ? "captured" : i === currentCoinIndex ? "active" : ""}">${cp ? "✓" : "$"}</span>`;
+        }).join("");
+      }
+
+      function updateHUD() {
+        const cur = missions.coins[currentCoinIndex];
+        const mission = captured.includes(cur?.id) ? missions.coins.find((c) => !captured.includes(c.id)) : cur;
+        const target = mission || { x: "?", y: "?" };
+        mechanicStage.querySelector(".cc-mission-target").textContent = `(${target.x}, ${target.y})`;
+        mechanicStage.querySelector(".cc-coin-count").textContent = `${captured.length}/${missions.coins.length}`;
+        mechanicStage.querySelector("[data-cc-score]").textContent = state.score;
+        mechanicStage.querySelector("[data-cc-attempts]").textContent = attempts;
+        mechanicStage.querySelector("[data-cc-xp]").textContent = state.xp;
+        if (captured.length >= missions.coins.length) {
+          mechanicStage.querySelector(".cc-mission-text").textContent = "Todas as moedas capturadas!";
+        }
+        renderCoinGrid();
+      }
+
+      function render() {
+        const cur = missions.coins[currentCoinIndex];
+        const stdHud = stage.querySelector(".level-hud");
+        const stdProg = stage.querySelector(".progress-track");
+        if (stdHud) stdHud.style.display = "none";
+        if (stdProg) stdProg.style.display = "none";
+        mechanicStage.style.padding = "0";
+        mechanicStage.innerHTML = `
+          <div class="cc-layout">
+            <div class="cc-canvas-area">
+              <canvas id="ccCanvas" class="cc-canvas"></canvas>
+              <div class="cc-mission-bar">
+                <span class="cc-mission-label">Missão:</span>
+                <span class="cc-mission-target">(${cur.x}, ${cur.y})</span>
+              </div>
+            </div>
+            <div class="cc-panel">
+              <div class="cc-level-title">
+                <strong>Nível ${levelId}</strong>
+                <span>${missions.name}</span>
+              </div>
+              <div class="cc-stats">
+                <div><span>Moedas</span><strong class="cc-coin-count">0/${missions.coins.length}</strong></div>
+                <div><span>Pontos</span><strong data-cc-score>0</strong></div>
+                <div><span>Tentativas</span><strong data-cc-attempts>0</strong></div>
+                <div><span>XP</span><strong data-cc-xp>0</strong></div>
+              </div>
+              <div class="cc-input-area">
+                <label>Digite a função para capturar a moeda:</label>
+                <div class="cc-input-row">
+                  <span class="cc-fx">f(x) =</span>
+                  <input type="text" id="ccFunctionInput" class="cc-input" placeholder="ex: 2x+1" autocomplete="off" spellcheck="false">
+                </div>
+                <button class="btn primary" id="ccBuildBtn" type="button">Construir reta</button>
+              </div>
+              <div class="cc-progress-area">
+                <span class="cc-progress-label">Progresso das moedas:</span>
+                <div class="cc-coin-grid"></div>
+              </div>
+              <div class="cc-feedback-area" id="ccFeedback">
+                <p class="cc-mission-text">Capture a moeda no ponto indicado. Digite f(x)=ax+b e clique em "Construir reta".</p>
+              </div>
+            </div>
+          </div>
+        `;
+
+        resizeCanvas();
+        drawCanvas(cur, null);
+        renderCoinGrid();
+        updateHUD();
+
+        const input = mechanicStage.querySelector("#ccFunctionInput");
+        const buildBtn = mechanicStage.querySelector("#ccBuildBtn");
+
+        function doCheck() {
+          if (captured.length >= missions.coins.length) return;
+          const val = input.value.trim();
+          if (!val) { feedback("Digite uma função primeiro!", false); return; }
+          const parsed = parseFunction(val);
+          if (!parsed) {
+            feedback("Formato inválido. Use f(x)=ax+b, ex: 2x+1", false);
+            return;
+          }
+          const coin = missions.coins[currentCoinIndex];
+          const result = parsed.a * coin.x + parsed.b;
+          lastLineFunc = (x) => parsed.a * x + parsed.b;
+          drawCanvas(coin, lastLineFunc);
+          if (Math.abs(result - coin.y) < 0.01) {
+            captured.push(coin.id);
+            state.correct++;
+            const bonus = Math.max(10, 20 - attempts * 2);
+            state.score += bonus;
+            state.xp += 10;
+            attempts = 0;
+            feedback("Moeda capturada! ✓", true);
+            beep("ok");
+            updateHUD();
+            if (captured.length >= missions.coins.length) {
+              const accuracy = Math.round((state.correct / (state.correct + state.wrong)) * 100);
+              const totalAttempts = state.correct + state.wrong;
+              state.score += 30;
+              state.xp += 20;
+              mechanicStage.querySelector(".cc-mission-text").textContent = "Todas as moedas capturadas! Missão cumprida! 🎉";
+              setTimeout(() => onFinish(state), 1200);
+            } else {
+              currentCoinIndex++;
+              mechanicStage.querySelector(".cc-mission-text").textContent = `Moeda capturada! Próximo alvo:`;
+              setTimeout(updateHUD, 300);
+            }
+          } else {
+            attempts++;
+            state.wrong++;
+            state.score = Math.max(0, state.score - 3);
+            const hintA = parsed.a !== coin.refA ? "ajuste o coeficiente angular (a)" : "";
+            const hintB = parsed.b !== coin.refB ? "ajuste o coeficiente linear (b)" : "";
+            const hint = hintA && hintB ? `${hintA} e ${hintB}` : hintA || hintB || "tente outros valores";
+            feedback(`A reta não passou em (${coin.x}, ${coin.y}). Na sua função, f(${coin.x}) = ${result.toFixed(1)}. Dica: ${hint}.`, false);
+            updateHUD();
+          }
+        }
+
+        buildBtn.addEventListener("click", doCheck);
+        input.addEventListener("keydown", (e) => { if (e.key === "Enter") doCheck(); });
+        setTimeout(() => input.focus(), 200);
+      }
+
+      function resizeCanvas() {
+        const canvas = mechanicStage.querySelector("#ccCanvas");
+        if (!canvas) return;
+        const container = mechanicStage.querySelector(".cc-canvas-area");
+        const rect = container.getBoundingClientRect();
+        const size = Math.min(rect.width - 2, 600);
+        canvas.width = size;
+        canvas.height = size;
+      }
+
+      render();
+      window.addEventListener("resize", resizeCanvas);
+    }
+
     root.querySelectorAll("[data-close-game]").forEach((button) => button.addEventListener("click", close));
     modal.addEventListener("click", (event) => {
       if (event.target === modal) close();
@@ -427,7 +752,8 @@
       city: renderCity,
       decode: renderDecode,
       combat: renderCombat,
-      "complex-plane": renderComplexPlane
+      "complex-plane": renderComplexPlane,
+      "capture-coins": renderCaptureCoins
     };
     (renderers[mechanic.type] || renderInvestigation)(topic, challenge, state, stage, answerChallenge);
   }
@@ -663,6 +989,10 @@
       <div class="option-grid">${optionsHtml(challenge)}</div>
     `;
     bindOptions(stage, challenge, answerChallenge, "Navegação concluída.");
+  }
+
+  function renderCaptureCoins(topic, challenge, state, stage, answerChallenge) {
+    stage.innerHTML = `<p class="game-question">Jogo Missão das Retas carregando...</p>`;
   }
 
   function unlockMedals(progress, topic, mechanic) {
