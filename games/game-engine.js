@@ -14,7 +14,7 @@
 
   const MECHANICS = {
     "funcao-1-grau": { type: "capture-coins", name: "Missão das Retas", medal: "Mestre das Funções" },
-    "funcao-2-grau": { type: "parabola", name: "Plano de parábolas", medal: "Arquiteto das Parábolas" },
+    "funcao-2-grau": { type: "capture-parabolas", name: "Missão das Parábolas", medal: "Arquiteto das Parábolas" },
     conjuntos: { type: "set-sort", name: "Laboratório de conjuntos", medal: "Guardião dos Conjuntos" },
     pa: { type: "sequence", name: "Sequência contra o tempo", medal: "Mestre das Sequências" },
     pg: { type: "growth", name: "Crescimento exponencial", medal: "Estrategista da PG" },
@@ -40,48 +40,96 @@
     "funcao-1-grau": {
       1: {
         name: "Introdução",
-        description: "Use funções simples para capturar moedas",
+        description: "Cada moeda exige uma função diferente",
         coins: [
-          { id: 0, x: 2, y: 4, refA: 1, refB: 2, desc: "f(x) = x + 2" },
-          { id: 1, x: 3, y: 5, refA: 1, refB: 2, desc: "f(x) = x + 2" },
-          { id: 2, x: 1, y: 4, refA: 1, refB: 3, desc: "f(x) = x + 3" }
+          { id: 0, x: 1, y: 3, refA: 1, refB: 2, desc: "f(x) = x + 2" },
+          { id: 1, x: 3, y: 7, refA: 2, refB: 1, desc: "f(x) = 2x + 1" },
+          { id: 2, x: -1, y: 4, refA: -1, refB: 3, desc: "f(x) = -x + 3" }
         ]
       },
       2: {
         name: "Coeficiente Angular",
-        description: "Ajuste a inclinação da reta",
+        description: "Varie a inclinação — inclui função decrescente",
         coins: [
           { id: 0, x: 2, y: 5, refA: 2, refB: 1, desc: "f(x) = 2x + 1" },
-          { id: 1, x: 3, y: 7, refA: 2, refB: 1, desc: "f(x) = 2x + 1" },
-          { id: 2, x: 4, y: 2, refA: 0.5, refB: 0, desc: "f(x) = x/2" }
+          { id: 1, x: 3, y: 0, refA: -1, refB: 3, desc: "f(x) = -x + 3", constraint: "decreasing" },
+          { id: 2, x: -2, y: -3, refA: 1, refB: -1, desc: "f(x) = x - 1" }
         ]
       },
       3: {
         name: "Coeficiente Linear",
-        description: "Ajuste onde a reta corta o eixo Y",
+        description: "Ajuste o coeficiente linear com restrições",
         coins: [
-          { id: 0, x: 2, y: 7, refA: 2, refB: 3, desc: "f(x) = 2x + 3" },
-          { id: 1, x: 3, y: 5, refA: 1, refB: 2, desc: "f(x) = x + 2" },
-          { id: 2, x: 1, y: -1, refA: 2, refB: -3, desc: "f(x) = 2x - 3" }
+          { id: 0, x: -1, y: 5, refA: -2, refB: 3, desc: "f(x) = -2x + 3", constraint: "decreasing" },
+          { id: 1, x: 2, y: -3, refA: 2, refB: -7, desc: "f(x) = 2x - 7", constraint: "increasing" },
+          { id: 2, x: 4, y: 1, refA: 1, refB: -3, desc: "f(x) = x - 3" }
         ]
       },
       4: {
         name: "Desafios",
-        description: "Combine coeficientes para capturar moedas",
+        description: "Duas moedas alinhadas — uma função captura ambas!",
         coins: [
-          { id: 0, x: 5, y: 10, refA: 1, refB: 5, desc: "f(x) = x + 5" },
-          { id: 1, x: 3, y: 0, refA: 1, refB: -3, desc: "f(x) = x - 3" },
-          { id: 2, x: -2, y: 4, refA: -2, refB: 0, desc: "f(x) = -2x" }
+          { id: 0, x: 1, y: 4, refA: 2, refB: 2, desc: "f(x) = 2x + 2", pairedIds: [1] },
+          { id: 1, x: 3, y: 8, refA: 2, refB: 2, desc: "f(x) = 2x + 2", pairedIds: [0] },
+          { id: 2, x: 5, y: 6, refA: 1, refB: 1, desc: "f(x) = x + 1" }
         ]
       },
       5: {
         name: "Desafio Final",
-        description: "Várias moedas! Capture todas com funções diferentes",
+        description: "Dois pares alinhados com restrições de crescimento",
         coins: [
-          { id: 0, x: 2, y: 8, refA: 3, refB: 2, desc: "f(x) = 3x + 2" },
-          { id: 1, x: 4, y: -1, refA: -1, refB: 3, desc: "f(x) = -x + 3" },
-          { id: 2, x: 1, y: 5, refA: 4, refB: 1, desc: "f(x) = 4x + 1" },
-          { id: 3, x: -3, y: 1, refA: 1, refB: 4, desc: "f(x) = x + 4" }
+          { id: 0, x: 1, y: 2, refA: 3, refB: -1, desc: "f(x) = 3x - 1", pairedIds: [1], constraint: "increasing" },
+          { id: 1, x: 3, y: 8, refA: 3, refB: -1, desc: "f(x) = 3x - 1", pairedIds: [0] },
+          { id: 2, x: 2, y: 4, refA: -3, refB: 10, desc: "f(x) = -3x + 10", pairedIds: [3], constraint: "decreasing" },
+          { id: 3, x: 4, y: -2, refA: -3, refB: 10, desc: "f(x) = -3x + 10", pairedIds: [2] }
+        ]
+      }
+    },
+    "funcao-2-grau": {
+      1: {
+        name: "Introdução às Parábolas",
+        description: "Use f(x)=ax²+bx+c para capturar moedas",
+        coins: [
+          { id: 0, x: 0, y: 1, refA: 1, refB: 0, refC: 1, desc: "f(x) = x² + 1", isQuad: true },
+          { id: 1, x: 2, y: 3, refA: 1, refB: -4, refC: 7, desc: "f(x) = x² - 4x + 7", isQuad: true },
+          { id: 2, x: -1, y: 4, refA: 1, refB: 0, refC: 3, desc: "f(x) = x² + 3", isQuad: true }
+        ]
+      },
+      2: {
+        name: "Vértice",
+        description: "A moeda está no vértice da parábola",
+        coins: [
+          { id: 0, x: 2, y: 1, refA: 1, refB: -4, refC: 5, desc: "f(x) = x² - 4x + 5", isQuad: true, atVertex: true },
+          { id: 1, x: -1, y: -2, refA: 1, refB: 2, refC: -1, desc: "f(x) = x² + 2x - 1", isQuad: true, atVertex: true },
+          { id: 2, x: 1, y: 0, refA: 1, refB: -2, refC: 1, desc: "f(x) = x² - 2x + 1", isQuad: true }
+        ]
+      },
+      3: {
+        name: "Raízes",
+        description: "Duas moedas são raízes — uma função captura ambas!",
+        coins: [
+          { id: 0, x: 1, y: 0, refA: 1, refB: -4, refC: 3, desc: "f(x) = x² - 4x + 3", isQuad: true, pairedIds: [1] },
+          { id: 1, x: 3, y: 0, refA: 1, refB: -4, refC: 3, desc: "f(x) = x² - 4x + 3", isQuad: true, pairedIds: [0] },
+          { id: 2, x: 2, y: 4, refA: -1, refB: 4, refC: 0, desc: "f(x) = -x² + 4x", isQuad: true }
+        ]
+      },
+      4: {
+        name: "Desafios",
+        description: "Vértice e raízes combinados",
+        coins: [
+          { id: 0, x: 3, y: 2, refA: 1, refB: -6, refC: 11, desc: "f(x) = x² - 6x + 11", isQuad: true, atVertex: true },
+          { id: 1, x: 1, y: 0, refA: 1, refB: -6, refC: 5, desc: "f(x) = x² - 6x + 5", isQuad: true, pairedIds: [2] },
+          { id: 2, x: 5, y: 0, refA: 1, refB: -6, refC: 5, desc: "f(x) = x² - 6x + 5", isQuad: true, pairedIds: [1] }
+        ]
+      },
+      5: {
+        name: "Desafio Final",
+        description: "Pares de raízes e parábola com vértice",
+        coins: [
+          { id: 0, x: -3, y: 0, refA: 1, refB: 2, refC: -3, desc: "f(x) = x² + 2x - 3", isQuad: true, pairedIds: [1] },
+          { id: 1, x: 1, y: 0, refA: 1, refB: 2, refC: -3, desc: "f(x) = x² + 2x - 3", isQuad: true, pairedIds: [0] },
+          { id: 2, x: 2, y: 3, refA: -1, refB: 4, refC: -1, desc: "f(x) = -x² + 4x - 1", isQuad: true, pairedIds: [3], constraint: "concaveDown" },
+          { id: 3, x: 4, y: -1, refA: -1, refB: 4, refC: -1, desc: "f(x) = -x² + 4x - 1", isQuad: true, pairedIds: [2] }
         ]
       }
     }
@@ -364,7 +412,7 @@
         stage.querySelector("[data-time]").textContent = `${minutes}:${rest}`;
       }, 1000);
 
-      if (mechanic.type === "capture-coins") {
+      if (mechanic.type === "capture-coins" || mechanic.type === "capture-parabolas") {
         startCaptureCoins(topic, activeLevel, mechanic, state, stage, finishLevel, feedback);
         return;
       }
@@ -397,8 +445,10 @@
       state.finished = true;
       clearInterval(timer);
       const missionsForLevel = CAPTURE_COINS_DATA[topic.id]?.[state.level.id];
-      const total = missionsForLevel ? missionsForLevel.coins.length : state.level.challenges.length;
-      const accuracy = missionsForLevel ? Math.round((state.correct / total) * 100) : Math.round((state.correct / total) * 100);
+      const total = missionsForLevel
+        ? missionsForLevel.coins.length - missionsForLevel.coins.filter((c) => c.pairedIds && c.pairedIds.some((pid) => pid < c.id)).length
+        : state.level.challenges.length;
+      const accuracy = Math.round((state.correct / total) * 100);
       const stars = accuracy >= 90 && state.wrong === 0 ? 3 : accuracy >= 65 ? 2 : 1;
       const bonus = state.wrong === 0 ? 30 : 0;
       const gainedXp = state.xp + 50 + bonus;
@@ -458,54 +508,89 @@
       const missions = CAPTURE_COINS_DATA[topic.id]?.[levelId];
       if (!missions) { feedback("Missão não encontrada!", false); return; }
 
+      const isQuad = missions.coins[0]?.isQuad;
       let currentCoinIndex = 0;
       let attempts = 0;
       let captured = [];
-      let lastLineFunc = null;
+      let lastCurveFunc = null;
       const mechanicStage = stage.querySelector("[data-mechanic-stage]");
+
+      function parseLinear(s) {
+        s = s.replace(/\*x/g, "x");
+        if (s === "x") return { a: 1, b: 0 };
+        if (s === "-x") return { a: -1, b: 0 };
+        const xIdx = s.indexOf("x");
+        if (xIdx >= 0) {
+          let aStr = s.slice(0, xIdx), rest = s.slice(xIdx + 1);
+          let a = 1;
+          if (aStr === "" || aStr === "+") a = 1;
+          else if (aStr === "-") a = -1;
+          else if (aStr.includes("/")) { const p = aStr.split("/"); a = parseFloat(p[0]) / parseFloat(p[1]); }
+          else a = parseFloat(aStr);
+          let b = 0;
+          if (rest) {
+            rest = rest.replace(/\+/g, " +").replace(/-/g, " -").trim();
+            for (const part of rest.split(/\s+/).filter(Boolean)) { const n = parseFloat(part); if (!isNaN(n)) b += n; }
+          }
+          return { a, b, c: 0 };
+        }
+        const n = parseFloat(s);
+        if (!isNaN(n)) return { a: 0, b: n, c: 0 };
+        return null;
+      }
+
+      function parseQuadratic(s) {
+        s = s.replace(/²/g, "^2").replace(/x2(?!\d)/g, "x^2").replace(/x\^2/g, "q").replace(/\*x/g, "x");
+        let a = 0, b = 0, c = 0;
+        let t = s.replace(/-/g, "+-").split("+").filter(Boolean);
+        for (const term of t) {
+          if (term.includes("q")) {
+            const parts = term.split("q");
+            const coef = parts[0];
+            if (coef === "" || coef === "1") a += 1;
+            else if (coef === "-1") a += -1;
+            else a += parseFloat(coef);
+          } else if (term.includes("x")) {
+            const parts = term.split("x");
+            const coef = parts[0];
+            if (coef === "" || coef === "1") b += 1;
+            else if (coef === "-1") b += -1;
+            else b += parseFloat(coef);
+          } else if (term !== "") {
+            c += parseFloat(term);
+          }
+        }
+        return { a, b, c };
+      }
 
       function parseFunction(input) {
         let s = input.replace(/\s/g, "").toLowerCase();
         s = s.replace(/^f\(x\)=/, "");
-        s = s.replace(/\*x/g, "x");
         if (!s) return null;
-        if (s === "x") return { a: 1, b: 0 };
-        if (s === "-x") return { a: -1, b: 0 };
-        const xIndex = s.indexOf("x");
-        if (xIndex >= 0) {
-          let aStr = s.slice(0, xIndex);
-          let rest = s.slice(xIndex + 1);
-          let a = 1;
-          if (aStr === "" || aStr === "+") a = 1;
-          else if (aStr === "-") a = -1;
-          else {
-            if (aStr.includes("/")) {
-              const parts = aStr.split("/");
-              a = parseFloat(parts[0]) / parseFloat(parts[1]);
-            } else a = parseFloat(aStr);
-          }
-          let b = 0;
-          if (rest) {
-            rest = rest.replace(/\+/g, " +").replace(/-/g, " -").trim();
-            const parts = rest.split(/\s+/).filter(Boolean);
-            for (const part of parts) {
-              const num = parseFloat(part);
-              if (!isNaN(num)) b += num;
-            }
-          }
-          return { a, b };
-        }
-        const justNum = parseFloat(s);
-        if (!isNaN(justNum)) return { a: 0, b: justNum };
+        if (isQuad) return parseQuadratic(s);
+        return parseLinear(s);
+      }
+
+      function constraintLabel(coin) {
+        if (!coin.constraint) return "";
+        const labels = { increasing: "CRESCENTE (a>0)", decreasing: "DECRESCENTE (a<0)", concaveUp: "CÔNCAVA P/CIMA (a>0)", concaveDown: "CÔNCAVA P/BAIXO (a<0)" };
+        return labels[coin.constraint] || "";
+      }
+
+      function checkConstraint(parsed, coin) {
+        if (!coin.constraint) return null;
+        if (coin.constraint === "increasing" && parsed.a <= 0) return "A função precisa ser CRESCENTE (a > 0).";
+        if (coin.constraint === "decreasing" && parsed.a >= 0) return "A função precisa ser DECRESCENTE (a < 0).";
+        if (coin.constraint === "concaveUp" && parsed.a <= 0) return "A parábola precisa ter concavidade para CIMA (a > 0).";
+        if (coin.constraint === "concaveDown" && parsed.a >= 0) return "A parábola precisa ter concavidade para BAIXO (a < 0).";
         return null;
       }
 
-      function drawCanvas(coin, lineFunc) {
+      function drawCanvas(coin, curveFunc) {
         const canvas = mechanicStage.querySelector("#ccCanvas");
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
-        const W = canvas.width, H = canvas.height;
-        const pad = 40;
+        const W = canvas.width, H = canvas.height, pad = 40;
         const gW = W - pad * 2, gH = H - pad * 2;
         const xMin = -8, xMax = 8, yMin = -8, yMax = 8;
         const xS = gW / (xMax - xMin), yS = gH / (yMax - yMin);
@@ -517,14 +602,8 @@
         const gridColor = getComputedStyle(document.documentElement).getPropertyValue("--border") || "#e0e8f0";
         const textColor = getComputedStyle(document.documentElement).getPropertyValue("--muted") || "#666";
         ctx.strokeStyle = gridColor; ctx.lineWidth = 0.5;
-        for (let i = xMin; i <= xMax; i++) {
-          const x = pad + (i - xMin) * xS;
-          ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke();
-        }
-        for (let i = yMin; i <= yMax; i++) {
-          const y = H - pad - (i - yMin) * yS;
-          ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
-        }
+        for (let i = xMin; i <= xMax; i++) { const x = pad + (i - xMin) * xS; ctx.beginPath(); ctx.moveTo(x, pad); ctx.lineTo(x, H - pad); ctx.stroke(); }
+        for (let i = yMin; i <= yMax; i++) { const y = H - pad - (i - yMin) * yS; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke(); }
         const y0 = H - pad - (0 - yMin) * yS, x0 = pad + (0 - xMin) * xS;
         ctx.strokeStyle = textColor; ctx.lineWidth = 1.8;
         ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(W - pad, y0); ctx.stroke();
@@ -534,11 +613,9 @@
         ctx.textAlign = "right";
         for (let i = yMin; i <= yMax; i++) { if (i === 0) continue; ctx.fillText(i, x0 - 6, H - pad - (i - yMin) * yS + 4); }
         ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.font = "bold 11px sans-serif";
-        ctx.fillText("x", W - pad + 12, y0 + 4);
-        ctx.fillText("y", x0 - 14, pad - 6);
-        ctx.fillText("0", x0 - 10, y0 + 16);
+        ctx.fillText("x", W - pad + 12, y0 + 4); ctx.fillText("y", x0 - 14, pad - 6); ctx.fillText("0", x0 - 10, y0 + 16);
 
-        const func = lineFunc || lastLineFunc;
+        const func = curveFunc || lastCurveFunc;
         if (func) {
           ctx.strokeStyle = "#0f9f8f"; ctx.lineWidth = 3;
           ctx.beginPath(); let first = true;
@@ -558,23 +635,20 @@
           const cx = pad + (c.x - xMin) * xS, cy = H - pad - (c.y - yMin) * yS;
           if (cp) {
             ctx.fillStyle = "#4caf50"; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = "#fff"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center";
-            ctx.fillText("✓", cx, cy + 4);
+            ctx.fillStyle = "#fff"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center"; ctx.fillText("✓", cx, cy + 4);
           } else {
             const grad = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 12);
             grad.addColorStop(0, "#ffd700"); grad.addColorStop(0.6, "#ffa500"); grad.addColorStop(1, "#b8860b");
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
             ctx.strokeStyle = "#b8860b"; ctx.lineWidth = 1.5; ctx.stroke();
-            ctx.fillStyle = "#8B6914"; ctx.font = "bold 11px sans-serif"; ctx.textAlign = "center";
-            ctx.fillText("$", cx, cy + 4);
+            ctx.fillStyle = "#8B6914"; ctx.font = "bold 11px sans-serif"; ctx.textAlign = "center"; ctx.fillText("$", cx, cy + 4);
           }
         });
 
         const cur = missions.coins[currentCoinIndex];
         if (cur && !captured.includes(cur.id)) {
           ctx.fillStyle = "#ef5b7d"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center";
-          const cx = pad + (cur.x - xMin) * xS, cy = H - pad - (cur.y - yMin) * yS;
-          ctx.fillText("◉", cx, cy - 18);
+          ctx.fillText("◉", pad + (cur.x - xMin) * xS, H - pad - (cur.y - yMin) * yS - 18);
         }
       }
 
@@ -587,18 +661,21 @@
         }).join("");
       }
 
+      function skipCaptured() {
+        while (currentCoinIndex < missions.coins.length && captured.includes(missions.coins[currentCoinIndex].id)) {
+          currentCoinIndex++;
+        }
+      }
+
       function updateHUD() {
+        skipCaptured();
         const cur = missions.coins[currentCoinIndex];
-        const mission = captured.includes(cur?.id) ? missions.coins.find((c) => !captured.includes(c.id)) : cur;
-        const target = mission || { x: "?", y: "?" };
+        const target = cur || { x: "?", y: "?" };
         mechanicStage.querySelector(".cc-mission-target").textContent = `(${target.x}, ${target.y})`;
         mechanicStage.querySelector(".cc-coin-count").textContent = `${captured.length}/${missions.coins.length}`;
         mechanicStage.querySelector("[data-cc-score]").textContent = state.score;
         mechanicStage.querySelector("[data-cc-attempts]").textContent = attempts;
         mechanicStage.querySelector("[data-cc-xp]").textContent = state.xp;
-        if (captured.length >= missions.coins.length) {
-          mechanicStage.querySelector(".cc-mission-text").textContent = "Todas as moedas capturadas!";
-        }
         renderCoinGrid();
       }
 
@@ -609,19 +686,26 @@
         if (stdHud) stdHud.style.display = "none";
         if (stdProg) stdProg.style.display = "none";
         mechanicStage.style.padding = "0";
+
+        const constraint = constraintLabel(cur);
+        const inputPlaceholder = isQuad ? "ex: x²+2x+1" : "ex: 2x+1";
+        const inputLabel = isQuad ? "Digite f(x)=ax²+bx+c (use x² ou x^2 ou x2):" : "Digite f(x)=ax+b:";
+        const hintText = isQuad ? "Digite a função quadrática e clique em \"Construir parábola\"." : "Capture a moeda digitando f(x)=ax+b.";
+
         mechanicStage.innerHTML = `
           <div class="cc-layout">
             <div class="cc-canvas-area">
               <canvas id="ccCanvas" class="cc-canvas"></canvas>
               <div class="cc-mission-bar">
-                <span class="cc-mission-label">Missão:</span>
+                <span class="cc-mission-label">${constraint ? `Missão (${constraint}):` : "Missão:"}</span>
                 <span class="cc-mission-target">(${cur.x}, ${cur.y})</span>
               </div>
             </div>
             <div class="cc-panel">
               <div class="cc-level-title">
-                <strong>Nível ${levelId}</strong>
-                <span>${missions.name}</span>
+                <strong>Nível ${levelId} — ${missions.name}</strong>
+                <span>${missions.description}</span>
+                ${constraint ? `<span class="cc-constraint-badge">${constraint}</span>` : ""}
               </div>
               <div class="cc-stats">
                 <div><span>Moedas</span><strong class="cc-coin-count">0/${missions.coins.length}</strong></div>
@@ -630,19 +714,19 @@
                 <div><span>XP</span><strong data-cc-xp>0</strong></div>
               </div>
               <div class="cc-input-area">
-                <label>Digite a função para capturar a moeda:</label>
+                <label>${inputLabel}</label>
                 <div class="cc-input-row">
                   <span class="cc-fx">f(x) =</span>
-                  <input type="text" id="ccFunctionInput" class="cc-input" placeholder="ex: 2x+1" autocomplete="off" spellcheck="false">
+                  <input type="text" id="ccFunctionInput" class="cc-input" placeholder="${inputPlaceholder}" autocomplete="off" spellcheck="false">
                 </div>
-                <button class="btn primary" id="ccBuildBtn" type="button">Construir reta</button>
+                <button class="btn primary" id="ccBuildBtn" type="button">${isQuad ? "Construir parábola" : "Construir reta"}</button>
               </div>
               <div class="cc-progress-area">
                 <span class="cc-progress-label">Progresso das moedas:</span>
                 <div class="cc-coin-grid"></div>
               </div>
               <div class="cc-feedback-area" id="ccFeedback">
-                <p class="cc-mission-text">Capture a moeda no ponto indicado. Digite f(x)=ax+b e clique em "Construir reta".</p>
+                <p class="cc-mission-text">${hintText}</p>
               </div>
             </div>
           </div>
@@ -661,44 +745,67 @@
           const val = input.value.trim();
           if (!val) { feedback("Digite uma função primeiro!", false); return; }
           const parsed = parseFunction(val);
-          if (!parsed) {
-            feedback("Formato inválido. Use f(x)=ax+b, ex: 2x+1", false);
+          if (!parsed || (isQuad && (parsed.a === undefined || parsed.b === undefined || parsed.c === undefined))) {
+            feedback(isQuad ? "Formato inválido. Use ax²+bx+c, ex: x²+2x+1 (use x², x^2 ou x2)." : "Formato inválido. Use f(x)=ax+b, ex: 2x+1", false);
             return;
           }
+
           const coin = missions.coins[currentCoinIndex];
-          const result = parsed.a * coin.x + parsed.b;
-          lastLineFunc = (x) => parsed.a * x + parsed.b;
-          drawCanvas(coin, lastLineFunc);
+          const result = isQuad ? parsed.a * coin.x * coin.x + parsed.b * coin.x + parsed.c : parsed.a * coin.x + parsed.b;
+
+          if (isQuad) lastCurveFunc = (x) => parsed.a * x * x + parsed.b * x + parsed.c;
+          else lastCurveFunc = (x) => parsed.a * x + parsed.b;
+          drawCanvas(coin, lastCurveFunc);
+
+          const constraintMsg = checkConstraint(parsed, coin);
+          if (constraintMsg) {
+            attempts++; state.wrong++; state.score = Math.max(0, state.score - 3);
+            feedback(constraintMsg + " Tente novamente.", false);
+            updateHUD(); return;
+          }
+
           if (Math.abs(result - coin.y) < 0.01) {
-            captured.push(coin.id);
+            let newlyCaptured = [coin.id];
+            if (coin.pairedIds) {
+              coin.pairedIds.forEach((pid) => {
+                const pc = missions.coins.find((c) => c.id === pid);
+                if (pc && !captured.includes(pid)) {
+                  const pr = isQuad ? parsed.a * pc.x * pc.x + parsed.b * pc.x + parsed.c : parsed.a * pc.x + parsed.b;
+                  if (Math.abs(pr - pc.y) < 0.01 && !captured.includes(pid)) newlyCaptured.push(pid);
+                }
+              });
+            }
+            newlyCaptured.forEach((id) => { if (!captured.includes(id)) captured.push(id); });
             state.correct++;
             const bonus = Math.max(10, 20 - attempts * 2);
-            state.score += bonus;
-            state.xp += 10;
+            state.score += bonus * newlyCaptured.length;
+            state.xp += 10 * newlyCaptured.length;
             attempts = 0;
-            feedback("Moeda capturada! ✓", true);
+            const msg = newlyCaptured.length > 1 ? `${newlyCaptured.length} moedas capturadas! ✓✓` : "Moeda capturada! ✓";
+            feedback(msg, true);
             beep("ok");
-            updateHUD();
             if (captured.length >= missions.coins.length) {
-              const accuracy = Math.round((state.correct / (state.correct + state.wrong)) * 100);
-              const totalAttempts = state.correct + state.wrong;
-              state.score += 30;
-              state.xp += 20;
+              state.score += 30; state.xp += 20;
               mechanicStage.querySelector(".cc-mission-text").textContent = "Todas as moedas capturadas! Missão cumprida! 🎉";
               setTimeout(() => onFinish(state), 1200);
             } else {
-              currentCoinIndex++;
-              mechanicStage.querySelector(".cc-mission-text").textContent = `Moeda capturada! Próximo alvo:`;
-              setTimeout(updateHUD, 300);
+              setTimeout(() => {
+                updateHUD();
+                mechanicStage.querySelector(".cc-mission-text").textContent = newlyCaptured.length > 1 ? "Par alinhado capturado! Próximo alvo:" : "Moeda capturada! Próximo alvo:";
+              }, 300);
             }
           } else {
-            attempts++;
-            state.wrong++;
-            state.score = Math.max(0, state.score - 3);
-            const hintA = parsed.a !== coin.refA ? "ajuste o coeficiente angular (a)" : "";
-            const hintB = parsed.b !== coin.refB ? "ajuste o coeficiente linear (b)" : "";
-            const hint = hintA && hintB ? `${hintA} e ${hintB}` : hintA || hintB || "tente outros valores";
-            feedback(`A reta não passou em (${coin.x}, ${coin.y}). Na sua função, f(${coin.x}) = ${result.toFixed(1)}. Dica: ${hint}.`, false);
+            attempts++; state.wrong++; state.score = Math.max(0, state.score - 3);
+            let hint = "";
+            if (isQuad) {
+              if (parsed.a !== coin.refA) hint = "ajuste o coeficiente a (termo quadrático)";
+              else if (parsed.b !== coin.refB) hint = "ajuste o coeficiente b (termo linear)";
+              else hint = "ajuste o coeficiente c (termo constante)";
+            } else {
+              if (parsed.a !== coin.refA) hint = "ajuste o coeficiente angular (a)";
+              else hint = "ajuste o coeficiente linear (b)";
+            }
+            feedback(`A curva não passou em (${coin.x}, ${coin.y}). f(${coin.x}) = ${result.toFixed(1)}. Dica: ${hint}.`, false);
             updateHUD();
           }
         }
@@ -714,8 +821,7 @@
         const container = mechanicStage.querySelector(".cc-canvas-area");
         const rect = container.getBoundingClientRect();
         const size = Math.min(rect.width - 2, 600);
-        canvas.width = size;
-        canvas.height = size;
+        canvas.width = size; canvas.height = size;
       }
 
       render();
@@ -753,7 +859,8 @@
       decode: renderDecode,
       combat: renderCombat,
       "complex-plane": renderComplexPlane,
-      "capture-coins": renderCaptureCoins
+      "capture-coins": renderCaptureCoins,
+      "capture-parabolas": renderCaptureCoins
     };
     (renderers[mechanic.type] || renderInvestigation)(topic, challenge, state, stage, answerChallenge);
   }

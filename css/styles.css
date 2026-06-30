@@ -1556,6 +1556,19 @@ a {
   line-height: 1.4;
 }
 
+.cc-constraint-badge {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rose) 22%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--rose) 45%, var(--border));
+  color: var(--rose);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 @media (max-width: 860px) {
   .cc-layout {
     grid-template-columns: 1fr;
